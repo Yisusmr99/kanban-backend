@@ -48,14 +48,13 @@ export class AuthController {
 
     @Post('logout')
     async logout(@Res() res: Response) {
-        console.log('logout');
         res.clearCookie('token', {
-        httpOnly: true,
-        secure: false, // Cambia a true si estás usando HTTPS
-        sameSite: 'strict', // Configura las reglas de envío de cookies
+            httpOnly: true,
+            secure: false, // Cambia a true si estás usando HTTPS
+            sameSite: 'strict', // Configura las reglas de envío de cookies
         });
         return res.status(200).json({
-        message: 'Logged out successfully',
+            message: 'Logged out successfully',
         });
     }
 }
