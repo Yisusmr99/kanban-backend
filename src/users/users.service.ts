@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -23,5 +23,12 @@ export class UsersService {
 
     async findOneByUsername(username: string): Promise<User | null> {
         return this.usersRepository.findOne({ where: { username } });
+    }
+
+    async getUsers(): Promise<Partial<User>[]> {
+        const data = this.usersRepository.find({
+            select: ['id', 'username', 'full_name'], // Especifica los campos que deseas
+        });
+        return data;
     }
 }

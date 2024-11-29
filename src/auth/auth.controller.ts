@@ -8,6 +8,7 @@ export class AuthController {
 
     @Post('register')
     async register(@Body() body: { email: string, password: string, username: string, fullName: string }) {
+        console.log(body, 'el body');
         return this.authService.register(body.email, body.password, body.username, body.fullName);
     }
 
@@ -30,8 +31,8 @@ export class AuthController {
             // Configurar la cookie con el token JWT
             res.cookie('token', access_token, {
                 httpOnly: true, // No accesible desde JavaScript en el navegador
-                secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
-                sameSite: 'strict', // Prevenir CSRF
+                secure: false, // Solo HTTPS en producción
+                sameSite: 'lax', // Prevenir CSRF
                 maxAge: 60 * 60 * 1000, // 1 hora
             });
 
