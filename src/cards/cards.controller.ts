@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Body, Param } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Get } from '@nestjs/common';
 import { CardsService } from './cards.service';
 
 @Controller('cards')
@@ -6,12 +6,20 @@ export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
   @Post()
-  createCard(@Body() body: { columnId: number; title: string; description?: string; responsibleId?: number }) {
-    return this.cardsService.createCard(body.columnId, body.title, body.description, body.responsibleId);
+  createCard(@Body() body: { columnId: number; projectId: number; title: string; description?: string; responsibleId?: number }) {
+    return this.cardsService.createCard(body.columnId, body.projectId, body.title, body.description, body.responsibleId);
+  }
+
+  @Get('project/:projectId')
+  async getCardsByProject(@Param('projectId') projectId: number) {
+    return this.cardsService.getCardsByProject(projectId);
   }
 
   @Put(':id')
-  updateCard(@Param('id') id: number, @Body() body: { title?: string; description?: string; columnId?: number; responsibleId?: number }) {
-    return this.cardsService.updateCard(id, body.title, body.description, body.columnId, body.responsibleId);
+  async updateCardColumn(
+    @Param('id') id: number,
+    @Body() body: { columnId: number },
+  ) {
+    return this.cardsService.updateCardColumn(id, body.columnId);
   }
 }

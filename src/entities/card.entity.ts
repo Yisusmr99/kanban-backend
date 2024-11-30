@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { KanbanColumn } from './column.entity';
 import { User } from './user.entity';
+import { Project } from './project.entity';
 
 @Entity('cards')
 export class Card {
@@ -20,15 +21,14 @@ export class Card {
   @TableColumn({ nullable: true })
   description: string;
 
-  // Asociación con las columnas globales
-  @ManyToOne(() => KanbanColumn, (column) => column.cards, {
-    onDelete: 'CASCADE', // Cuando se elimina una columna, las tarjetas asociadas también se eliminan
-  })
+  @ManyToOne(() => KanbanColumn, (column) => column.cards, { onDelete: 'CASCADE' })
   column: KanbanColumn;
 
-  // Responsable de la tarjeta (opcional)
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true }) // Responsable opcional
   responsible: User;
+
+  @ManyToOne(() => Project, (project) => project.id, { onDelete: 'CASCADE' })
+  project: Project;
 
   @CreateDateColumn()
   created_at: Date;
