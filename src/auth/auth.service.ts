@@ -1,14 +1,19 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { ResponseHelper } from '../utils/response.helper'; // Asegúrate de importar correctamente
+import { ResponseHelper } from '../utils/response.helper'; 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -28,8 +33,14 @@ export class AuthService {
     const user = await this.validateUser(email, password);
     if (user) {
       const payload = { email: user.email, sub: user.id };
+
+      const access_token = this.jwtService.sign(payload);
+      const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
+      await this.usersRepository.update(user.id, { refresh_token });
+
       const data = {
-        access_token: this.jwtService.sign(payload),
+        access_token: access_token,
+        refresh_token: refresh_token,
         user
       }
       return ResponseHelper.success('Login successful', data);
@@ -50,6 +61,20 @@ export class AuthService {
       return ResponseHelper.success('User registered successfully', user);
     } catch (error) {
       return ResponseHelper.error('Failed to register user', error.message, 500);
+    }
+  }
+
+  async refreshToken(refresh_token: string) {
+    try {
+      const payload = this.jwtService.verify(refresh_token);
+      const user = await this.usersRepository.findOne({ where: { id: payload.sub, refresh_token } });
+      if (!user) {
+        return ResponseHelper.error('Invalid refresh token', null, 401);
+      }
+      const access_token = this.jwtService.sign({ email: user.email, sub: user.id }, { expiresIn: '1h' });
+      return ResponseHelper.success('Token refreshed successfully', access_token);
+    } catch (error) {
+      return ResponseHelper.error('Failed to refresh token', error.message, 500);
     }
   }
 }

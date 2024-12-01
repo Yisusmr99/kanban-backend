@@ -9,6 +9,7 @@ import { KanbanColumn } from './entities/column.entity';
 import { Card } from './entities/card.entity';
 import { ColumnsModule } from './columns/columns.module';
 import { CardsModule } from './cards/cards.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CardsModule } from './cards/cards.module';
     ProjectsModule,
     ColumnsModule,
     CardsModule,
+    CommentsModule,
   ]
 })
 export class AppModule {}

@@ -1,38 +1,39 @@
-import {
-  Entity,
-  Column as TableColumn,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, Column as TableColumn, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { KanbanColumn } from './column.entity';
 import { User } from './user.entity';
 import { Project } from './project.entity';
+import { Comment } from './comment.entity';
+import { table } from 'console';
 
 @Entity('cards')
 export class Card {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @TableColumn()
-  title: string;
+    @TableColumn()
+    title: string;
 
-  @TableColumn({ nullable: true })
-  description: string;
+    @TableColumn({ nullable: true })
+    description: string;
 
-  @ManyToOne(() => KanbanColumn, (column) => column.cards, { onDelete: 'CASCADE' })
-  column: KanbanColumn;
+    @ManyToOne(() => KanbanColumn, (column) => column.cards, { onDelete: 'CASCADE' })
+    column: KanbanColumn;
 
-  @ManyToOne(() => User, { nullable: true }) // Responsable opcional
-  responsible: User;
+    @ManyToOne(() => User, { nullable: true }) // Optional responsible user
+    responsible: User;
 
-  @ManyToOne(() => Project, (project) => project.id, { onDelete: 'CASCADE' })
-  project: Project;
+    @ManyToOne(() => Project, (project) => project.id, { onDelete: 'CASCADE' })
+    project: Project;
 
-  @CreateDateColumn()
-  created_at: Date;
+    @OneToMany(() => Comment, (comment) => comment.card, { cascade: true })
+    comments: Comment[];
 
-  @UpdateDateColumn()
-  updated_at: Date;
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
+
+    @TableColumn()
+    projectId: number;
 }

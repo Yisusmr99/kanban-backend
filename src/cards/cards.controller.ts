@@ -1,6 +1,9 @@
 import { Controller, Post, Body, Put, Param, Get } from '@nestjs/common';
 import { CardsService } from './cards.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UseGuards } from '@nestjs/common';
 
+@UseGuards(JwtAuthGuard)
 @Controller('cards')
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
@@ -12,7 +15,8 @@ export class CardsController {
 
   @Get('project/:projectId')
   async getCardsByProject(@Param('projectId') projectId: number) {
-    return this.cardsService.getCardsByProject(projectId);
+    const cards = await this.cardsService.getCardsByProject(projectId);
+    return cards;
   }
 
   @Put(':id')
@@ -22,4 +26,20 @@ export class CardsController {
   ) {
     return this.cardsService.updateCardColumn(id, body.columnId);
   }
+
+  @Put('update-card/:id')
+  editCard(
+    @Param('id') cardId: number,
+    @Body() body: { columnId: number; projectId: number; title: string; description?: string; responsibleId?: number },
+  ) {
+    return this.cardsService.editCard(
+      cardId,
+      body.columnId,
+      body.projectId,
+      body.title,
+      body.description,
+      body.responsibleId,
+    );
+  }
+
 }

@@ -1,8 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, 
-    UpdateDateColumn, OneToMany, ManyToMany, DeleteDateColumn
-} from "typeorm";
-import { Project } from "./project.entity";
-import { Card } from "./card.entity";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany, DeleteDateColumn } from 'typeorm';
+import { Project } from './project.entity';
+import { Card } from './card.entity';
+import { Comment } from './comment.entity';
 
 @Entity('users')
 export class User {
@@ -20,15 +19,18 @@ export class User {
 
     @Column()
     password: string;
+    
+    @Column({ default: null })
+    refresh_token: string;
 
-    @Column({ default: true})
+    @Column({ default: true })
     isActive: boolean;
 
-    // Relación con los proyectos que este usuario posee
+    // Relation with projects owned by the user
     @OneToMany(() => Project, (project) => project.owner)
     ownedProjects: Project[];
 
-    // Relación con los proyectos en los que este usuario colabora
+    // Relation with projects where the user collaborates
     @ManyToMany(() => Project, (project) => project.collaborators)
     projects: Project[];
 
@@ -43,4 +45,8 @@ export class User {
 
     @OneToMany(() => Card, (card) => card.responsible)
     cards: Card[];
+
+    // Relation with comments made by the user (optional)
+    @OneToMany(() => Comment, (comment) => comment.user)
+    comments: Comment[];
 }

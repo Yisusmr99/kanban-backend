@@ -5,6 +5,8 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from '../users/users.module';
+import { User } from '../entities/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -14,6 +16,7 @@ import { UsersModule } from '../users/users.module';
       secret: 'your_jwt_secret', // Configura tu JWT_SECRET
       signOptions: { expiresIn: '1h' },
     }),
+    TypeOrmModule.forFeature([User])
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
