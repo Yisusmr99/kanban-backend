@@ -6,6 +6,7 @@ import { KanbanColumn } from '../entities/column.entity';
 import { User } from '../entities/user.entity';
 import { Project } from '../entities/project.entity';
 import { ResponseHelper } from 'src/utils/response.helper';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class CardsService {
@@ -18,6 +19,7 @@ export class CardsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+    private readonly emailService: EmailService, // Inyecta el servicio de correo
   ) {}
 
   async createCard(
@@ -51,6 +53,20 @@ export class CardsService {
 
     const cardSaved = await this.cardRepository.save(card);
 
+    // **Envío de correo**
+    if (responsible) {
+      const emailData = {
+        task: cardSaved.title,
+        description: cardSaved.description,
+        user_name: responsible.full_name,
+      };
+      try {
+        await this.emailService.sendNotificationEmail(responsible.email, emailData, 'new-task');
+      } catch (error) {
+        console.error('Error enviando correo:', error.message);
+      }
+    }
+
     return {
       statusCode: 201,
       message: 'Card created successfully',
@@ -80,7 +96,9 @@ export class CardsService {
 
   async updateCardColumn(cardId: number, columnId: number): Promise<Card> {
     // Find the card by its ID
-    const card = await this.cardRepository.findOne({ where: { id: cardId } });
+    const card = await this.cardRepository.findOne({ 
+      where: { id: cardId }, relations: ['column', 'responsible'], 
+    });
     if (!card) {
       throw new NotFoundException('Card not found');
     }
@@ -90,12 +108,30 @@ export class CardsService {
     if (!column) {
       throw new NotFoundException('Column not found');
     }
+    const cardBeforeUpdate: Card = { ...card };
 
     // Update the card's column
     card.column = column;
 
+    const updatedCard = await this.cardRepository.save(card);
+
+    if(updatedCard){
+      const emailData = {
+        task: cardBeforeUpdate.title,
+        description: cardBeforeUpdate.description,
+        user_name: cardBeforeUpdate.responsible.full_name,
+        previus_state: cardBeforeUpdate.column.name,
+        new_state: updatedCard.column.name,
+      };
+      try {
+        await this.emailService.sendNotificationEmail(cardBeforeUpdate.responsible.email, emailData, 'change-status');
+      } catch (error) {
+        console.error('Error enviando correo:', error.message);
+      }
+    }
+
     // Save the updated card
-    return this.cardRepository.save(card);
+    return updatedCard;
   }
 
 

@@ -10,6 +10,7 @@ import { Card } from './entities/card.entity';
 import { ColumnsModule } from './columns/columns.module';
 import { CardsModule } from './cards/cards.module';
 import { CommentsModule } from './comments/comments.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CommentsModule } from './comments/comments.module';
     ColumnsModule,
     CardsModule,
     CommentsModule,
+    EmailModule,
   ]
 })
 export class AppModule {}
