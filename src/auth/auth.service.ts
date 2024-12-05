@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { ResponseHelper } from '../utils/response.helper'; 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -34,7 +34,7 @@ export class AuthService {
     if (user) {
       const payload = { email: user.email, sub: user.id };
 
-      const access_token = this.jwtService.sign(payload);
+      const access_token = this.jwtService.sign(payload, { expiresIn: '6h' });
       const refresh_token = this.jwtService.sign(payload, { expiresIn: '7d' });
       await this.usersRepository.update(user.id, { refresh_token });
 
@@ -71,7 +71,7 @@ export class AuthService {
       if (!user) {
         return ResponseHelper.error('Invalid refresh token', null, 401);
       }
-      const access_token = this.jwtService.sign({ email: user.email, sub: user.id }, { expiresIn: '1h' });
+      const access_token = this.jwtService.sign({ email: user.email, sub: user.id }, { expiresIn: '6h' });
       return ResponseHelper.success('Token refreshed successfully', access_token);
     } catch (error) {
       return ResponseHelper.error('Failed to refresh token', error.message, 500);

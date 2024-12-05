@@ -11,6 +11,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Card } from './card.entity';
 
 @Entity('projects')
 export class Project {
@@ -48,4 +49,7 @@ export class Project {
 
   @DeleteDateColumn()
   deleted_at: Date;
+
+  @OneToMany(() => Card, (card) => card.project)
+  cards: Card[];
 }

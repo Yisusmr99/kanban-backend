@@ -11,16 +11,19 @@ import { ColumnsModule } from './columns/columns.module';
 import { CardsModule } from './cards/cards.module';
 import { CommentsModule } from './comments/comments.module';
 import { EmailModule } from './email/email.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
+  
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
       port: 3306,
-      username : 'root',
-      password : '',
-      database : 'kanban',
+      host: process.env.DATABASE_HOST,
+      // port: parseInt(process.env.DATABASE_PORT, 10) || 3007,
+      username: process.env.DATABASE_USER ?? 'root',
+      password: process.env.DATABASE_PASSWORD ?? '',
+      database: process.env.DATABASE_NAME ?? 'kanban',
       entities: [User, Project, KanbanColumn, Card],
       autoLoadEntities: true,
       synchronize: true,
@@ -32,6 +35,7 @@ import { EmailModule } from './email/email.module';
     CardsModule,
     CommentsModule,
     EmailModule,
+    DashboardModule,
   ]
 })
 export class AppModule {}

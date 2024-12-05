@@ -25,7 +25,6 @@ export class EmailService {
         },
       );
 
-      console.log('Correo enviado:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error enviando correo:', error.response?.data || error.message);
@@ -99,7 +98,6 @@ export class EmailService {
         },
       );
 
-      console.log('Correo enviado:', response.data);
     } catch (error) {
       console.error('Error enviando correo:', error.response?.data || error.message);
       throw new Error('No se pudo enviar el correo');

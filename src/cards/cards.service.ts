@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Card } from '../entities/card.entity';
@@ -78,7 +78,7 @@ export class CardsService {
     // Verificar que el proyecto exista
     const project = await this.projectRepository.findOne({ where: { id: projectId } });
     if (!project) {
-      throw new NotFoundException('Project not found');
+      return ResponseHelper.error('Project not found', 'Project not found', 404);
     }
 
     // Obtener las tarjetas asociadas a las columnas del proyecto
@@ -88,10 +88,10 @@ export class CardsService {
     });
 
     if (!cards.length) {
-      throw new NotFoundException('No cards found for this project');
+      return ResponseHelper.error('The project has no tasks assigned yet', 'The project has no tasks assigned yet', 404);
     }
 
-    return ResponseHelper.success('Cards retrieved successfully', cards);
+    return ResponseHelper.success('tasks retrieved successfully', cards);
   }
 
   async updateCardColumn(cardId: number, columnId: number): Promise<Card> {
@@ -100,7 +100,7 @@ export class CardsService {
       where: { id: cardId }, relations: ['column', 'responsible'], 
     });
     if (!card) {
-      throw new NotFoundException('Card not found');
+      throw new NotFoundException('Task not found');
     }
 
     // Find the column by its ID
@@ -145,7 +145,7 @@ export class CardsService {
   ) {
     const card = await this.cardRepository.findOne({ where: { id: cardId } });
     if (!card) {
-      throw new NotFoundException('Card not found');
+      throw new NotFoundException('Task not found');
     }
   
     const column = await this.columnRepository.findOne({ where: { id: columnId } });
@@ -170,7 +170,7 @@ export class CardsService {
   
     const updatedCard = await this.cardRepository.save(card);
     
-    return ResponseHelper.success('Card updated successfully', updatedCard);
+    return ResponseHelper.success('Task updated successfully', updatedCard);
   }
   
 }

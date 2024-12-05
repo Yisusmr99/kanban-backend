@@ -1,9 +1,8 @@
-import { Entity, Column as TableColumn, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column as TableColumn, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, Column, JoinColumn } from 'typeorm';
 import { KanbanColumn } from './column.entity';
 import { User } from './user.entity';
 import { Project } from './project.entity';
 import { Comment } from './comment.entity';
-import { table } from 'console';
 
 @Entity('cards')
 export class Card {

@@ -4,8 +4,6 @@ import { Repository } from 'typeorm';
 import { Project } from '../entities/project.entity';
 import { User } from '../entities/user.entity';
 import { ResponseHelper } from 'src/utils/response.helper';
-// import { KanbanColumn } from 'src/entities/column.entity';
-// import { Card } from 'src/entities/card.entity';
 
 @Injectable()
 export class ProjectsService {
@@ -134,34 +132,5 @@ export class ProjectsService {
     });
     return ResponseHelper.success('Project deleted successfully', all_projects);
   }
-
-  // async getProjectBoard(projectId: number) {
-  //   const project = await this.projectRepository.findOne({
-  //     where: { id: projectId },
-  //   });
-
-  //   if (!project) {
-  //     throw new NotFoundException('Project not found');
-  //   }
-
-  //   const columns = await this.columnRepository.find({
-  //     relations: ['cards', 'cards.responsible'],
-  //     order: { position: 'ASC' },
-  //   });
-
-  //   const cards = await this.cardRepository.find({
-  //     where: { project: { id: projectId } },
-  //     relations: ['responsible', 'column'],
-  //   });
-
-  //   return {
-  //     statusCode: 200,
-  //     message: 'Project board retrieved successfully',
-  //     data: {
-  //       columns,
-  //       cards,
-  //     },
-  //   };
-  // }
   
 }
