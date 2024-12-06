@@ -29,38 +29,53 @@ export class ProjectsService {
 
   //Obtener proyectos de un usuario (como propietario o colaborador)
   async getUserProjects(userId: number) {
-      // Obtener proyectos donde el usuario es propietario
-      const ownedProjects = await this.projectRepository.find({
-        where: { owner: { id: userId } },
-        relations: ['owner', 'collaborators'],
-      });
-    
-      // Marcar los proyectos como "owner"
-      const projectsWithRoles = ownedProjects.map((project) => ({
+    // Obtener proyectos donde el usuario es propietario
+    const ownedProjects = await this.projectRepository.find({
+      where: { owner: { id: userId } },
+      relations: ['owner', 'collaborators'],
+    });
+
+    // Marcar los proyectos como "owner"
+    const projectsWithRoles = ownedProjects.map((project) => ({
+      ...project,
+      role: 'owner', // Este usuario es el propietario
+    }));
+
+    // Obtener proyectos donde el usuario es colaborador
+    const collaboratingProjects = await this.projectRepository.find({
+      relations: ['owner', 'collaborators'],
+    });
+
+    // Filtrar proyectos donde el usuario es colaborador
+    const filteredCollaboratingProjects = collaboratingProjects
+      .filter((project) =>
+        project.collaborators.some((collaborator) => collaborator.id === userId)
+      )
+      .map((project) => ({
         ...project,
-        role: 'owner', // Este usuario es el propietario
+        role: 'collaborator', // Este usuario es colaborador
       }));
-    
-      // Obtener proyectos donde el usuario es colaborador
-      const collaboratingProjects = await this.projectRepository.find({
-        relations: ['owner', 'collaborators'],
-      });
-    
-      // Iterar sobre los proyectos y verificar si el usuario es colaborador
-      const filteredCollaboratingProjects = collaboratingProjects
-        .filter((project) =>
-          project.collaborators.some((collaborator) => collaborator.id === userId)
-        )
-        .map((project) => ({
-          ...project,
-          role: 'collaborator', // Este usuario es colaborador
-        }));
-    
-      // Combinar ambos arrays
-      const allProjects = [...projectsWithRoles, ...filteredCollaboratingProjects];
-    
-      // Retornar todos los proyectos con los roles correspondientes
-      return ResponseHelper.success('Projects retrieved successfully', allProjects);
+
+    // Combinar ambos arrays y eliminar duplicados
+    const projectMap = new Map<number, any>();
+
+    // Agregar proyectos como "owner" al map
+    projectsWithRoles.forEach((project) => {
+      projectMap.set(project.id, project);
+    });
+
+    // Agregar proyectos como "collaborator" al map, si no existen
+    filteredCollaboratingProjects.forEach((project) => {
+      if (!projectMap.has(project.id)) {
+        projectMap.set(project.id, project);
+      }
+    });
+
+    // Convertir el map a un array
+    const allProjects = Array.from(projectMap.values());
+
+    // Retornar todos los proyectos con los roles correspondientes
+    return ResponseHelper.success('Projects retrieved successfully', allProjects);
   }
 
   // Agregar colaboradores a un proyecto

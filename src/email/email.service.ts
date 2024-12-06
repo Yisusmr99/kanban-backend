@@ -55,7 +55,8 @@ export class EmailService {
         htmlContent = htmlContent
         .replace('{{user_name}}', data.user_name)
         .replace('{{task}}', data.task)
-        .replace('{{description}}', data.description);
+        .replace('{{description}}', data.description)
+        .replace('{{projectName}}', data.projectName);
         subject = 'Nueva tarea asignada';
     }
 
@@ -64,7 +65,8 @@ export class EmailService {
         htmlContent = htmlContent
         .replace('{{user_name}}', data.user_name)
         .replace('{{task}}', data.task)
-        .replace('{{description}}', data.description);
+        .replace('{{description}}', data.description)
+        .replace('{{projectName}}', data.projectName);
         subject = 'Nuevo comentario en tarea';
     }
 
@@ -75,7 +77,8 @@ export class EmailService {
         .replace('{{previus_state}}', data.previus_state)
         .replace('{{new_state}}', data.new_state)
         .replace('{{task}}', data.task)
-        .replace('{{description}}', data.description);
+        .replace('{{description}}', data.description)
+        .replace('{{projectName}}', data.projectName);
         subject = 'Estado de tarea actualizado';
     }
 

@@ -59,6 +59,7 @@ export class CardsService {
         task: cardSaved.title,
         description: cardSaved.description,
         user_name: responsible.full_name,
+        projectName: project.name,
       };
       try {
         await this.emailService.sendNotificationEmail(responsible.email, emailData, 'new-task');
@@ -97,7 +98,7 @@ export class CardsService {
   async updateCardColumn(cardId: number, columnId: number): Promise<Card> {
     // Find the card by its ID
     const card = await this.cardRepository.findOne({ 
-      where: { id: cardId }, relations: ['column', 'responsible'], 
+      where: { id: cardId }, relations: ['column', 'responsible', 'project'], 
     });
     if (!card) {
       throw new NotFoundException('Task not found');
@@ -122,6 +123,7 @@ export class CardsService {
         user_name: cardBeforeUpdate.responsible.full_name,
         previus_state: cardBeforeUpdate.column.name,
         new_state: updatedCard.column.name,
+        projectName: cardBeforeUpdate.project.name,
       };
       try {
         await this.emailService.sendNotificationEmail(cardBeforeUpdate.responsible.email, emailData, 'change-status');

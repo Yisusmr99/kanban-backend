@@ -67,6 +67,7 @@ export class CommentsService {
                         task: card.title,
                         description: content,
                         user_name: user.full_name,
+                        projectName: project.name,
                     }, 'task-commented');
                 } catch (error) {
                     console.error(`Error enviando correo a ${recipient.email}:`, error.message);
