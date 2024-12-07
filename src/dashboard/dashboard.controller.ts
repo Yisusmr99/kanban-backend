@@ -1,7 +1,6 @@
 import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { DashboardService } from './dashboard.service';
-import { ResponseHelper } from 'src/utils/response.helper';
 
 @UseGuards(JwtAuthGuard)
 @Controller('dashboard')
@@ -60,6 +59,7 @@ export class DashboardController {
                 deleted_at: project.deleted_at,
                 count_tasks_todo: project.cards.filter(card => card.column.name === 'To Do').length,
                 count_tasks_inprogress: project.cards.filter(card => card.column.name === 'In Progress').length,
+                count_tasks_review: project.cards.filter(card => card.column.name === 'In Review').length,
                 count_tasks_done: project.cards.filter(card => card.column.name === 'Done').length,
                 tasks_by_responsible: taskSummaryByResponsible, // Resumen por responsable para este proyecto
             };
